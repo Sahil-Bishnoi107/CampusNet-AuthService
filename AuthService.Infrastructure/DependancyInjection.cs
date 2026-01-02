@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AuthService.Domain.Interfaces;
 using AuthService.Infrastructure.Email;
+using AuthService.Infrastructure.Messaging;
 using AuthService.Infrastructure.Persistence;
 using AuthService.Infrastructure.Repositories;
 using AuthService.Infrastructure.Security;
@@ -28,6 +29,9 @@ namespace AuthService.Infrastructure
             services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddScoped<IPasswordSettingRepository, PasswordSettingRepository>();
+            services.AddSingleton<RabbitMqConnection>();
+            services.AddScoped<IUserEventPublisher, RabbitMqUserEventPublisher>();
+
 
 
 

@@ -7,7 +7,7 @@ using AuthService.Application.Registration;
 
 namespace AuthService.API.Controllers
 {
-    [Route("auth/register")]
+    [Route("campus-net/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
@@ -18,21 +18,21 @@ namespace AuthService.API.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("start")]
+        [HttpPost("register-start")]
         public async Task<IActionResult> Start(RegisterStartRequest r)
         {
             await _mediator.Send(new StartRegistrationCommand(r.Email, r.Name, r.PhoneNumber));
             return Ok();
         }
 
-        [HttpPost("verify-otp")]
+        [HttpPost("register-verify-otp")]
         public async Task<IActionResult> VerifyOtp(VerifyOtpRequest r)
         {
             await _mediator.Send(new VerifyRegistrationOtpCommand(r.Email, r.Otp));
             return Ok();
         }
 
-        [HttpPost("set-password")]
+        [HttpPost("register-set-password")]
         public async Task<IActionResult> SetPassword(SetPasswordRequest r)
         {
             await _mediator.Send(new SetPasswordCommand(r.Email, r.Password));

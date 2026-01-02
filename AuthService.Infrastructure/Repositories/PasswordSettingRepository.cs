@@ -33,7 +33,10 @@ namespace AuthService.Infrastructure.Repositories
                 throw new Exception("User not found");
             }
             user.SetPassword(newPassword);
-            _context.OtpTokens.Remove(b);
+           
+             _context.OtpTokens.Remove(b);
+
+            await _context.SaveChangesAsync();
 
         }
 

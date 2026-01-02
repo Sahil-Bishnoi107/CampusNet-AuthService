@@ -14,11 +14,13 @@ namespace AuthService.Application.Registration
     
         private readonly IUserCredentialRepository _users;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IUserEventPublisher _userEventPublisher;
 
-       public SetPasswordHandler(IUserCredentialRepository users, IPasswordHasher passwordHasher)
+        public SetPasswordHandler(IUserCredentialRepository users, IPasswordHasher passwordHasher, IUserEventPublisher userEventPublisher)
         {
             _users = users;
             _passwordHasher = passwordHasher;
+            _userEventPublisher = userEventPublisher;
         }
 
         public async Task Handle(SetPasswordCommand request, CancellationToken cancellationToken)
@@ -31,6 +33,8 @@ namespace AuthService.Application.Registration
 
             user.SetPassword(_passwordHasher.Hash(request.NewPassword));
             await _users.UpdateAsync(user);
+
+            await _userEventPublisher.PublishUserCreatedEventAsync(user.Id,user.Email,user.Name,user.PhoneNumber);
         }
 
 
