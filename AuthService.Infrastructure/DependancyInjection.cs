@@ -31,7 +31,7 @@ namespace AuthService.Infrastructure
             services.AddScoped<IPasswordSettingRepository, PasswordSettingRepository>();
             services.AddSingleton<RabbitMqConnection>();
             services.AddScoped<IUserEventPublisher, RabbitMqUserEventPublisher>();
-
+            services.AddScoped<INotificationPublisher,RabbitMqNotificationPublisher>();
 
 
 

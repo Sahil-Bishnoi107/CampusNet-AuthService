@@ -14,15 +14,19 @@ namespace AuthService.Infrastructure.Repositories
 
     {
         private readonly AuthDbContext _db;
+        private readonly IEmailService _emailService;
 
-        public OtpRepository(AuthDbContext db)
+        public OtpRepository(AuthDbContext db,IEmailService emailService)
         {
             _db = db;
+            _emailService = emailService;
         }
         public async Task AddAsync(OtpToken otp)
         {
             _db.OtpTokens.Add(otp);
             await _db.SaveChangesAsync();
+           
+
         }
 
         public async Task<OtpToken?> GetValidOtpAsync(string userId, string code)
@@ -73,6 +77,7 @@ namespace AuthService.Infrastructure.Repositories
             otp.setCode(newcode);
             otp.setExpiry();
             await UpdateAsync(otp);
+            
         }
     }
 }
