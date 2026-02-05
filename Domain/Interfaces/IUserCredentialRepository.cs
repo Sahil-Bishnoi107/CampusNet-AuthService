@@ -13,6 +13,7 @@ namespace AuthService.Domain.Interfaces
         Task AddAsync(UserCredentials user);
         Task<UserCredentials?> GetByEmailAsync(string email);
         Task UpdateAsync(UserCredentials user);
+        Task<UserCredentials> AddOrVerifySocialLogin(string email, string supabaseId, string provider, string name);
 
     }
 }

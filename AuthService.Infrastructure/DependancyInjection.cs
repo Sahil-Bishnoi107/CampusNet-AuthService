@@ -12,6 +12,9 @@ using AuthService.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AuthService.Infrastructure.supabase;
 
 namespace AuthService.Infrastructure
 {
@@ -31,9 +34,31 @@ namespace AuthService.Infrastructure
             services.AddScoped<IPasswordSettingRepository, PasswordSettingRepository>();
             services.AddSingleton<RabbitMqConnection>();
             services.AddScoped<IUserEventPublisher, RabbitMqUserEventPublisher>();
-            services.AddScoped<INotificationPublisher,RabbitMqNotificationPublisher>();
+            services.AddScoped<INotificationPublisher, RabbitMqNotificationPublisher>();
+            services.AddSingleton<SupabaseAuthService>();
 
+            services.AddAuthentication()
+              .AddJwtBearer("Supabase", options =>
+              {
+                  options.MapInboundClaims = false;
+           
+                  options.MetadataAddress =
+                      "https://jouwsalxgeleizhjzujq.supabase.co/auth/v1/.well-known/openid-configuration";
+           
+                  options.TokenValidationParameters = new TokenValidationParameters
+                  {
+                      ValidateIssuer = true,
+                      ValidIssuer = "https://jouwsalxgeleizhjzujq.supabase.co/auth/v1",
+           
+                      ValidateAudience = true,
+                      ValidAudience = "authenticated",
+           
+                      ValidateLifetime = true,
+                      ValidateIssuerSigningKey = true
+                  };
+              });
 
+            services.AddAuthorization();
 
             return services;
         }

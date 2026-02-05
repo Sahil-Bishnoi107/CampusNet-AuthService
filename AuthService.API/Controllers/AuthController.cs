@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AuthService.Application.Commands;
 using AuthService.Application.Registration;
+using Microsoft.AspNetCore.Authorization;
+using AuthService.Infrastructure.supabase;
 
 namespace AuthService.API.Controllers
 {
@@ -12,10 +14,14 @@ namespace AuthService.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<AuthController> _logger;
+        private readonly SupabaseAuthService _supabaseAuthService;
 
-        public AuthController(IMediator mediator)
+        public AuthController(IMediator mediator,ILogger<AuthController> logger,SupabaseAuthService supabaseAuthService)
         {
             _mediator = mediator;
+            _logger = logger;
+            _supabaseAuthService = supabaseAuthService;
         }
 
         [HttpPost("register-start")]
@@ -87,5 +93,42 @@ namespace AuthService.API.Controllers
             await _mediator.Send(new PasswordOtpResendCommand(request.email));
             return Ok();
         }
+
+
+        [HttpPost("social-login")]
+        public async Task<IActionResult> SupabaseLogin()
+        {
+           
+            var authHeader = Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer "))
+                return Unauthorized("Missing Authorization header");
+
+            var supabaseToken = authHeader["Bearer ".Length..];
+
+            var user = await _supabaseAuthService.GetUserFromToken(supabaseToken);
+            if (user == null)
+                return Unauthorized("Invalid Supabase token");
+
+            
+            var supabaseId = user.Id;
+            var email = user.Email;
+            var name =
+                user.UserMetadata?["name"]?.ToString() ??
+                user.UserMetadata?["full_name"]?.ToString() ??
+                user.UserMetadata?["given_name"]?.ToString() ??
+                "Supabase User";
+
+            var provider =
+                user.AppMetadata?["provider"]?.ToString() ?? "oauth";
+
+           
+
+            var token = await _mediator.Send(
+                new SocialLoginCommand(supabaseId, email!, name, provider)
+            );
+
+            return Ok(new { token });
+        }
+
     }
 }
