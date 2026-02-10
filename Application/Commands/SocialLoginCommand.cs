@@ -19,20 +19,23 @@ namespace AuthService.Application.Commands
         private readonly IUserCredentialRepository _userCredentialRepository;
         private readonly IJwtTokenGenerator _jwtTokenGenerator;
         private readonly IRefreshTokenRepository _refreshTokens;
+        
 
         public SocialLoginHandler(IUserCredentialRepository userCredentialRepository,IJwtTokenGenerator jwtTokenGenerator, IRefreshTokenRepository refreshTokenRepository)
         {
             _userCredentialRepository = userCredentialRepository;
             _jwtTokenGenerator = jwtTokenGenerator;
             _refreshTokens = refreshTokenRepository;
+            
         }
         public async Task<string> Handle(SocialLoginCommand request, CancellationToken cancellationToken)
         {
-         var user =   await _userCredentialRepository.AddOrVerifySocialLogin(request.email, request.supabaseId, request.authProvider, request.name);
+            var user =   await _userCredentialRepository.AddOrVerifySocialLogin(request.email, request.supabaseId, request.authProvider, request.name);
             
             
             string accessToken = _jwtTokenGenerator.Generate(user);
-
+            
+           
             return accessToken;
 
         }

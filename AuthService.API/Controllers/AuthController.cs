@@ -124,7 +124,7 @@ namespace AuthService.API.Controllers
            
 
             var token = await _mediator.Send(
-                new SocialLoginCommand(supabaseId, email!, name, provider)
+                new SocialLoginCommand(email!, supabaseId, name, provider)
             );
 
             return Ok(new { token });

@@ -14,10 +14,12 @@ namespace AuthService.Infrastructure.Repositories
     public class UserCredentialRepository : IUserCredentialRepository
     {
         private readonly AuthDbContext _db;
+        private readonly IUserEventPublisher _userEventPublisher;
 
-        public UserCredentialRepository(AuthDbContext db)
+        public UserCredentialRepository(AuthDbContext db, IUserEventPublisher userEventPublisher)
         {
             _db = db;
+            _userEventPublisher = userEventPublisher;
         }
 
         public async Task AddAsync(UserCredentials user)
@@ -56,6 +58,7 @@ namespace AuthService.Infrastructure.Repositories
             {
                 user = new UserCredentials(name, email, supabaseId, provider);   
                 _db.Users.Add(user);
+                await _userEventPublisher.PublishUserCreatedEventAsync(user.Id, user.Email, user.Name, "");
             }
             else if (user.SupabaseId == null)
             {
