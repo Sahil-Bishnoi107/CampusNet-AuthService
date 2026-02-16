@@ -11,9 +11,9 @@
         public bool IsEmailVerified { get; private set; }
         public bool IsActive { get; private set; }
 
-        public string SupabaseId { get; private set; } = null!;
+        public string? SupabaseId { get; private set; } = null!;
 
-        public string AuthProvider { get; private set; } = "local";
+        public string? AuthProvider { get; private set; } = "local";
         public DateTime CreatedAt { get; private set; }
 
         // ✅ REQUIRED BY EF
